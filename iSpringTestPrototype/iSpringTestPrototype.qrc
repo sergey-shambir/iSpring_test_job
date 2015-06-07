@@ -1,0 +1,16 @@
+<RCC>
+    <qresource prefix="/">
+        <file>qml/Window.qml</file>
+        <file>qml/RibbonUI.qml</file>
+        <file>assets/icon-rect.png</file>
+        <file>assets/icon-circle.png</file>
+        <file>assets/icon-triangle.png</file>
+        <file>qml/RibbonButton.qml</file>
+        <file>assets/document-new.png</file>
+        <file>assets/document-open.png</file>
+        <file>assets/document-save-as.png</file>
+        <file>assets/document-save.png</file>
+        <file>qml/FrameCornerArea.qml</file>
+        <file>qml/ShapesScene.qml</file>
+    </qresource>
+</RCC>
