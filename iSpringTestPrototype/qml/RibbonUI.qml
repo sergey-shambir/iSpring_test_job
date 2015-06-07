@@ -13,6 +13,8 @@ Rectangle {
     signal actionInsertRectangle()
     signal actionInsertTriangle()
     signal actionInsertEllipse()
+    signal actionUndo()
+    signal actionRedo()
 
     TabView {
         anchors.fill: parent
@@ -134,5 +136,22 @@ Rectangle {
                 }
             }
         }
+    }
+
+    Button {
+        x: 180
+        y: 4
+        width: 24
+        height: 24
+        iconSource: "qrc:/assets/lc_undo.png"
+        onClicked: actionUndo()
+    }
+    Button {
+        x: 210
+        y: 4
+        width: 24
+        height: 24
+        iconSource: "qrc:/assets/lc_redo.png"
+        onClicked: actionRedo()
     }
 }

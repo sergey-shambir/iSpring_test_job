@@ -7,6 +7,8 @@
 #include <memory>
 #include <functional>
 
+class ShapesScenePrivate;
+
 class ShapesScene
 {
 public:
@@ -28,16 +30,9 @@ public:
     void setUpdateCallback(const UpdateCallback &callback);
     bool pickNode(int x, int y);
     void setMinimalSize(int width, int height);
-
-    // Interface for commands
-    void insertNode(const NodePtr &node);
+    void undo();
+    void redo();
 
 private:
-    std::list<NodePtr> m_nodes;
-    std::vector<AbstractShapeCommandPtr> m_history;
-    std::pair<int, int> m_size;
-    std::pair<int, int> m_minimalSize;
-    bool m_isModified = false;
-    UpdateCallback m_updateCallback;
-    NodePtr m_pickedNode;
+    std::unique_ptr<ShapesScenePrivate> d;
 };

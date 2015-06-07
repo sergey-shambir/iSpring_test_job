@@ -12,5 +12,7 @@
         <file>assets/document-save.png</file>
         <file>qml/FrameCornerArea.qml</file>
         <file>qml/ShapesScene.qml</file>
+        <file>assets/lc_redo.png</file>
+        <file>assets/lc_undo.png</file>
     </qresource>
 </RCC>

@@ -4,27 +4,36 @@ import name.sshambir.ispringexam 1.0
 
 ShapesSceneView {
     id: root
-    property int _invariant: 0 // Invariant coordinate when resizing
+    property int _dragInvariant: 0 // Invariant coordinate when resizing
     property int _MINIMAL_SIZE: 60
 
-    function moveToEditFrame() {
+    function movePickedNode() {
         followEditFrame(editFrame.x, editFrame.y, editFrame.width, editFrame.height)
     }
     function resizeLeftEdge() {
-        var dx = _invariant - editFrame.x
+        var dx = _dragInvariant - editFrame.x
         followEditFrame(editFrame.x, editFrame.y, dx + editFrame.width, editFrame.height)
     }
     function resizeRightEdge() {
-        var dx = editFrame.x - _invariant
-        followEditFrame(_invariant, editFrame.y, dx + editFrame.width, editFrame.height)
+        var dx = editFrame.x - _dragInvariant
+        followEditFrame(_dragInvariant, editFrame.y, dx + editFrame.width, editFrame.height)
     }
     function resizeTopEdge() {
-        var dy = _invariant - editFrame.y
+        var dy = _dragInvariant - editFrame.y
         followEditFrame(editFrame.x, editFrame.y, editFrame.width, dy + editFrame.height)
     }
     function resizeBottomEdge() {
-        var dy = editFrame.y - _invariant
-        followEditFrame(editFrame.x, _invariant, editFrame.width, dy + editFrame.height)
+        var dy = editFrame.y - _dragInvariant
+        followEditFrame(editFrame.x, _dragInvariant, editFrame.width, dy + editFrame.height)
+    }
+    function toggleDragState(dragActive, dragFunction) {
+        if (dragActive) {
+            window.frameSwapped.connect(dragFunction)
+            onDragStarted()
+        } else {
+            window.frameSwapped.disconnect(dragFunction)
+            onDragFinished()
+        }
     }
     onEditFrameChanged: {
         editFrame.x = x
@@ -48,6 +57,8 @@ ShapesSceneView {
     Item {
         id: editFrame
         visible: false
+        focus: visible
+        Keys.onDeletePressed: deletePickedNode()
         MouseArea {
             anchors.fill: parent
             id: dragArea
@@ -59,14 +70,7 @@ ShapesSceneView {
             drag.minimumY: 0
             drag.maximumX: root.width - editFrame.width
             drag.maximumY: root.height - editFrame.height
-            drag.onActiveChanged: {
-                if (drag.active)
-                    window.frameSwapped.connect(moveToEditFrame)
-                else {
-                    window.frameSwapped.disconnect(moveToEditFrame)
-                    updateEditFrame()
-                }
-            }
+            drag.onActiveChanged: toggleDragState(drag.active, movePickedNode)
         }
         MouseArea {
             id: edgeLeft
@@ -79,13 +83,9 @@ ShapesSceneView {
             drag.target: editFrame
             drag.minimumX: 0
             drag.onActiveChanged: {
-                if (drag.active) {
-                    root._invariant = editFrame.x
-                    window.frameSwapped.connect(resizeLeftEdge)
-                } else {
-                    window.frameSwapped.disconnect(resizeLeftEdge)
-                    updateEditFrame()
-                }
+                if (drag.active)
+                    root._dragInvariant = editFrame.x
+                toggleDragState(drag.active, resizeLeftEdge)
             }
         }
         MouseArea {
@@ -99,13 +99,9 @@ ShapesSceneView {
             drag.target: editFrame
             drag.maximumX: root.width - editFrame.width
             drag.onActiveChanged: {
-                if (drag.active) {
-                    root._invariant = editFrame.x
-                    window.frameSwapped.connect(resizeRightEdge)
-                } else {
-                    window.frameSwapped.disconnect(resizeRightEdge)
-                    updateEditFrame()
-                }
+                if (drag.active)
+                    root._dragInvariant = editFrame.x
+                toggleDragState(drag.active, resizeRightEdge)
             }
         }
         MouseArea {
@@ -119,13 +115,9 @@ ShapesSceneView {
             drag.target: editFrame
             drag.minimumY: 0
             drag.onActiveChanged: {
-                if (drag.active) {
-                    root._invariant = editFrame.y
-                    window.frameSwapped.connect(resizeTopEdge)
-                } else {
-                    window.frameSwapped.disconnect(resizeTopEdge)
-                    updateEditFrame()
-                }
+                if (drag.active)
+                    root._dragInvariant = editFrame.y
+                toggleDragState(drag.active, resizeTopEdge)
             }
         }
         MouseArea {
@@ -139,13 +131,9 @@ ShapesSceneView {
             drag.target: editFrame
             drag.maximumY: root.height - editFrame.height
             drag.onActiveChanged: {
-                if (drag.active) {
-                    root._invariant = editFrame.y
-                    window.frameSwapped.connect(resizeBottomEdge)
-                } else {
-                    window.frameSwapped.disconnect(resizeBottomEdge)
-                    updateEditFrame()
-                }
+                if (drag.active)
+                    root._dragInvariant = editFrame.y
+                toggleDragState(drag.active, resizeBottomEdge)
             }
         }
         // TODO: fix corners positions - assign x/y/w/h right here

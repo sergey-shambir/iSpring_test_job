@@ -11,9 +11,11 @@ Rectangle {
         onActionOpen: shapesView.openDocument()
         onActionSave: shapesView.saveDocument()
         onActionSaveAs: shapesView.saveDocumentAs()
-        onActionInsertEllipse: shapesView.insertEllipse();
-        onActionInsertRectangle: shapesView.insertRectangle();
-        onActionInsertTriangle: shapesView.insertTriangle();
+        onActionInsertEllipse: shapesView.insertEllipse()
+        onActionInsertRectangle: shapesView.insertRectangle()
+        onActionInsertTriangle: shapesView.insertTriangle()
+        onActionRedo: shapesView.redo()
+        onActionUndo: shapesView.undo()
     }
 
     ShapesScene {

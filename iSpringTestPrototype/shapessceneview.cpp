@@ -149,6 +149,11 @@ void ShapesSceneView::clicked(int x, int y)
     update();
 }
 
+void ShapesSceneView::onDragStarted()
+{
+    m_dragInitialRect = m_scene->pickedNode()->boundingRect();
+}
+
 void ShapesSceneView::followEditFrame(float x, float y, float width, float height)
 {
     if (NodePtr node = m_scene->pickedNode()) {
@@ -158,12 +163,42 @@ void ShapesSceneView::followEditFrame(float x, float y, float width, float heigh
     }
 }
 
-void ShapesSceneView::updateEditFrame()
+void ShapesSceneView::onDragFinished()
 {
     if (NodePtr node = m_scene->pickedNode()) {
-        const rectangle &br = node->boundingRect();
-        emit editFrameChanged(br.x, br.y, br.width, br.height);
+        rectangle newBounds = node->boundingRect();
+        // Reset changes
+        node->moveTo(m_dragInitialRect.origin());
+        node->resizeTo(m_dragInitialRect.size());
+        auto command = std::make_shared<SetShapeBoundsCommand>(newBounds);
+        m_scene->doCommand(command);
+        emit editFrameChanged(newBounds.x, newBounds.y, newBounds.width, newBounds.height);
     }
+}
+
+void ShapesSceneView::deletePickedNode()
+{
+    auto command = std::make_shared<DeleteShapeCommand>();
+    m_scene->doCommand(command);
+    emit editFrameDisappeared();
+}
+
+void ShapesSceneView::undo()
+{
+    m_scene->undo();
+    if (!m_scene->pickedNode()) {
+        emit editFrameDisappeared();
+    }
+    update();
+}
+
+void ShapesSceneView::redo()
+{
+    m_scene->redo();
+    if (!m_scene->pickedNode()) {
+        emit editFrameDisappeared();
+    }
+    update();
 }
 
 void ShapesSceneView::warningOpenFailed(const QString &reason)

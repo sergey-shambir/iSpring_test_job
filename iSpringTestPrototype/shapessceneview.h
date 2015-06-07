@@ -2,6 +2,7 @@
 
 #include <QQuickPaintedItem>
 #include <memory>
+#include "../math/rectangle.h"
 
 class ShapesScene;
 
@@ -29,8 +30,12 @@ public slots:
     void insertRectangle();
     void insertEllipse();
     void clicked(int x, int y);
+    void onDragStarted();
     void followEditFrame(float x, float y, float width, float height);
-    void updateEditFrame();
+    void onDragFinished();
+    void deletePickedNode();
+    void undo();
+    void redo();
 
 private:
     void warningOpenFailed(const QString &reason);
@@ -41,4 +46,5 @@ private:
 
     QString m_documentPath;
     std::unique_ptr<ShapesScene> m_scene;
+    rectangle m_dragInitialRect;
 };
