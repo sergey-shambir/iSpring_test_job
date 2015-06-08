@@ -32,6 +32,8 @@ public:
     void setMinimalSize(int width, int height);
     void undo();
     void redo();
+    bool isUndoable() const;
+    bool isRedoable() const;
 
 private:
     std::unique_ptr<ShapesScenePrivate> d;

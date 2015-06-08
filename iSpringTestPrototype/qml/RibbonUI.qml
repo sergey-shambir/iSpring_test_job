@@ -3,6 +3,9 @@ import QtQuick.Controls 1.1
 import QtQuick.Controls.Styles 1.1
 
 Rectangle {
+    property bool isUndoEnabled: false
+    property bool isRedoEnabled: false
+
     implicitWidth: 600
     implicitHeight: 120
 
@@ -143,6 +146,7 @@ Rectangle {
         y: 4
         width: 24
         height: 24
+        enabled: isUndoEnabled
         iconSource: "qrc:/assets/lc_undo.png"
         onClicked: actionUndo()
     }
@@ -151,6 +155,7 @@ Rectangle {
         y: 4
         width: 24
         height: 24
+        enabled: isRedoEnabled
         iconSource: "qrc:/assets/lc_redo.png"
         onClicked: actionRedo()
     }

@@ -16,6 +16,8 @@ Rectangle {
         onActionInsertTriangle: shapesView.insertTriangle()
         onActionRedo: shapesView.redo()
         onActionUndo: shapesView.undo()
+        isUndoEnabled: shapesView.isUndoEnabled
+        isRedoEnabled: shapesView.isRedoEnabled
     }
 
     ShapesScene {

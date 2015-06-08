@@ -176,7 +176,7 @@ void ShapesScene::setMinimalSize(int width, int height)
 
 void ShapesScene::undo()
 {
-    if (d->m_usedHistorySize > 0) {
+    if (isUndoable()) {
         AbstractShapeCommandPtr command = d->m_history[d->m_usedHistorySize - 1];
         if (command->undo(*d)) {
             --d->m_usedHistorySize;
@@ -186,13 +186,22 @@ void ShapesScene::undo()
 
 void ShapesScene::redo()
 {
-    if (d->m_usedHistorySize < d->m_history.size()) {
+    if (isRedoable()) {
         AbstractShapeCommandPtr command = d->m_history[d->m_usedHistorySize];
         if (command->redo(*d)) {
             ++d->m_usedHistorySize;
         }
     }
-    // TODO: implement redo
+}
+
+bool ShapesScene::isUndoable() const
+{
+    return d->m_usedHistorySize > 0;
+}
+
+bool ShapesScene::isRedoable() const
+{
+    return d->m_usedHistorySize < d->m_history.size();
 }
 
 const NodePtr &ShapesScene::pickedNode() const

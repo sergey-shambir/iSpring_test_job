@@ -186,19 +186,13 @@ void ShapesSceneView::deletePickedNode()
 void ShapesSceneView::undo()
 {
     m_scene->undo();
-    if (!m_scene->pickedNode()) {
-        emit editFrameDisappeared();
-    }
-    update();
+    updateSceneAndUi();
 }
 
 void ShapesSceneView::redo()
 {
     m_scene->redo();
-    if (!m_scene->pickedNode()) {
-        emit editFrameDisappeared();
-    }
-    update();
+    updateSceneAndUi();
 }
 
 void ShapesSceneView::warningOpenFailed(const QString &reason)
@@ -248,12 +242,49 @@ bool ShapesSceneView::ensureChangesSaved()
     return true;
 }
 
+void ShapesSceneView::updateSceneAndUi()
+{
+    setIsUndoEnabled(m_scene->isUndoable());
+    setIsRedoEnabled(m_scene->isRedoable());
+    if (!m_scene->pickedNode()) {
+        emit editFrameDisappeared();
+    }
+    ShapesSceneView::update();
+}
+
 std::unique_ptr<ShapesScene> ShapesSceneView::makeScene()
 {
     std::unique_ptr<ShapesScene> scene{new ShapesScene};
     scene->setMinimalSize(width(), height());
     scene->setUpdateCallback([this]() -> void {
-        ShapesSceneView::update();
+        updateSceneAndUi();
     });
     return scene;
 }
+
+bool ShapesSceneView::isRedoEnabled() const
+{
+    return m_isRedoEnabled;
+}
+
+void ShapesSceneView::setIsRedoEnabled(bool isRedoEnabled)
+{
+    if (m_isRedoEnabled != isRedoEnabled) {
+        m_isRedoEnabled = isRedoEnabled;
+        emit isRedoEnabledChanged();
+    }
+}
+
+bool ShapesSceneView::isUndoEnabled() const
+{
+    return m_isUndoEnabled;
+}
+
+void ShapesSceneView::setIsUndoEnabled(bool isUndoEnabled)
+{
+    if (m_isUndoEnabled != isUndoEnabled) {
+        m_isUndoEnabled = isUndoEnabled;
+        emit isUndoEnabledChanged();
+    }
+}
+
