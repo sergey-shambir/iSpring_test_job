@@ -4,30 +4,51 @@ import name.sshambir.ispringexam 1.0
 
 ShapesSceneView {
     id: root
-    property int _dragInvariant: 0 // Invariant coordinate when resizing
+    property vector2d _dragStart;
     property int _MINIMAL_SIZE: 60
 
     function movePickedNode() {
         followEditFrame(editFrame.x, editFrame.y, editFrame.width, editFrame.height)
     }
     function resizeLeftEdge() {
-        var dx = _dragInvariant - editFrame.x
+        var dx = _dragStart.x - editFrame.x
         followEditFrame(editFrame.x, editFrame.y, dx + editFrame.width, editFrame.height)
     }
     function resizeRightEdge() {
-        var dx = editFrame.x - _dragInvariant
-        followEditFrame(_dragInvariant, editFrame.y, dx + editFrame.width, editFrame.height)
+        var dx = editFrame.x - _dragStart.x
+        followEditFrame(_dragStart.x, editFrame.y, dx + editFrame.width, editFrame.height)
     }
     function resizeTopEdge() {
-        var dy = _dragInvariant - editFrame.y
+        var dy = _dragStart.y - editFrame.y
         followEditFrame(editFrame.x, editFrame.y, editFrame.width, dy + editFrame.height)
     }
     function resizeBottomEdge() {
-        var dy = editFrame.y - _dragInvariant
-        followEditFrame(editFrame.x, _dragInvariant, editFrame.width, dy + editFrame.height)
+        var dy = editFrame.y - _dragStart.y
+        followEditFrame(editFrame.x, _dragStart.y, editFrame.width, dy + editFrame.height)
+    }
+    function resizeTopLeftCorner() {
+        var dx = _dragStart.x - editFrame.x
+        var dy = _dragStart.y - editFrame.y
+        followEditFrame(editFrame.x, editFrame.y, dx + editFrame.width, dy + editFrame.height)
+    }
+    function resizeTopRightCorner() {
+        var dx = editFrame.x - _dragStart.x
+        var dy = _dragStart.y - editFrame.y
+        followEditFrame(_dragStart.x, editFrame.y, dx + editFrame.width, dy + editFrame.height)
+    }
+    function resizeBottomLeftCorner() {
+        var dx = _dragStart.x - editFrame.x
+        var dy = editFrame.y - _dragStart.y
+        followEditFrame(editFrame.x, _dragStart.y, dx + editFrame.width, dy + editFrame.height)
+    }
+    function resizeBottomRightCorner() {
+        var dx = editFrame.x - _dragStart.x
+        var dy = editFrame.y - _dragStart.y
+        followEditFrame(_dragStart.x, _dragStart.y, dx + editFrame.width, dy + editFrame.height)
     }
     function toggleDragState(dragActive, dragFunction) {
         if (dragActive) {
+            _dragStart = Qt.vector2d(editFrame.x, editFrame.y)
             window.frameSwapped.connect(dragFunction)
             onDragStarted()
         } else {
@@ -41,10 +62,30 @@ ShapesSceneView {
         editFrame.width = width
         editFrame.height = height
         editFrame.visible = true
-        edgeLeft.drag.maximumX = editFrame.x + editFrame.width - _MINIMAL_SIZE
-        edgeRight.drag.minimumX = editFrame.x - editFrame.width + _MINIMAL_SIZE
-        edgeTop.drag.maximumY = editFrame.y + editFrame.heiht - _MINIMAL_SIZE
-        edgeBottom.drag.minimumY = editFrame.y - editFrame.height + _MINIMAL_SIZE
+        {
+            var edge = x + width - _MINIMAL_SIZE
+            edgeLeft.drag.maximumX = edge
+            cornerTopLeft.drag.maximumX = edge
+            cornerBottomLeft.drag.maximumX = edge
+        }
+        {
+            var edge = x - width + _MINIMAL_SIZE
+            edgeRight.drag.minimumX = edge
+            cornerTopRight.drag.minimumX = edge
+            cornerBottomRight.drag.minimumX = edge
+        }
+        {
+            var edge = y + height - _MINIMAL_SIZE
+            edgeTop.drag.maximumY = edge
+            cornerTopLeft.drag.maximumY = edge
+            cornerTopRight.drag.maximumY = edge
+        }
+        {
+            var edge = y - height + _MINIMAL_SIZE
+            edgeBottom.drag.minimumY = edge
+            cornerBottomLeft.drag.minimumY = edge
+            cornerBottomRight.drag.minimumY = edge
+        }
     }
     onEditFrameDisappeared: {
         editFrame.visible = false
@@ -82,11 +123,7 @@ ShapesSceneView {
             drag.axis: Drag.XAxis
             drag.target: editFrame
             drag.minimumX: 0
-            drag.onActiveChanged: {
-                if (drag.active)
-                    root._dragInvariant = editFrame.x
-                toggleDragState(drag.active, resizeLeftEdge)
-            }
+            drag.onActiveChanged: toggleDragState(drag.active, resizeLeftEdge)
         }
         MouseArea {
             id: edgeRight
@@ -98,11 +135,7 @@ ShapesSceneView {
             drag.axis: Drag.XAxis
             drag.target: editFrame
             drag.maximumX: root.width - editFrame.width
-            drag.onActiveChanged: {
-                if (drag.active)
-                    root._dragInvariant = editFrame.x
-                toggleDragState(drag.active, resizeRightEdge)
-            }
+            drag.onActiveChanged: toggleDragState(drag.active, resizeRightEdge)
         }
         MouseArea {
             id: edgeTop
@@ -114,11 +147,7 @@ ShapesSceneView {
             drag.axis: Drag.YAxis
             drag.target: editFrame
             drag.minimumY: 0
-            drag.onActiveChanged: {
-                if (drag.active)
-                    root._dragInvariant = editFrame.y
-                toggleDragState(drag.active, resizeTopEdge)
-            }
+            drag.onActiveChanged: toggleDragState(drag.active, resizeTopEdge)
         }
         MouseArea {
             id: edgeBottom
@@ -130,28 +159,59 @@ ShapesSceneView {
             drag.axis: Drag.YAxis
             drag.target: editFrame
             drag.maximumY: root.height - editFrame.height
-            drag.onActiveChanged: {
-                if (drag.active)
-                    root._dragInvariant = editFrame.y
-                toggleDragState(drag.active, resizeBottomEdge)
-            }
+            drag.onActiveChanged: toggleDragState(drag.active, resizeBottomEdge)
         }
-        // TODO: fix corners positions - assign x/y/w/h right here
-        FrameCornerArea {
+        MouseArea {
             id: cornerTopLeft
             cursorShape: Qt.SizeFDiagCursor
+            x: -4
+            y: -4
+            width: 8
+            height: 8
+            drag.axis: Drag.XAndYAxis
+            drag.target: editFrame
+            drag.minimumX: 0
+            drag.minimumY: 0
+            drag.onActiveChanged: toggleDragState(drag.active, resizeTopLeftCorner)
         }
-        FrameCornerArea {
+        MouseArea {
             id: cornerBottomLeft
             cursorShape: Qt.SizeBDiagCursor
+            x: -4
+            y: editFrame.height - 4
+            width: 8
+            height: 8
+            drag.axis: Drag.XAndYAxis
+            drag.target: editFrame
+            drag.minimumX: 0
+            drag.maximumY: root.height - editFrame.height
+            drag.onActiveChanged: toggleDragState(drag.active, resizeBottomLeftCorner)
         }
-        FrameCornerArea {
+        MouseArea {
             id: cornerTopRight
             cursorShape: Qt.SizeBDiagCursor
+            x: editFrame.width - 4
+            y: -4
+            width: 8
+            height: 8
+            drag.axis: Drag.XAndYAxis
+            drag.target: editFrame
+            drag.maximumX: root.width - editFrame.width
+            drag.minimumY: 0
+            drag.onActiveChanged: toggleDragState(drag.active, resizeTopRightCorner)
         }
-        FrameCornerArea {
+        MouseArea {
             id: cornerBottomRight
             cursorShape: Qt.SizeFDiagCursor
+            x: editFrame.width - 4
+            y: editFrame.height - 4
+            width: 8
+            height: 8
+            drag.axis: Drag.XAndYAxis
+            drag.target: editFrame
+            drag.maximumX: root.width - editFrame.width
+            drag.maximumY: root.height - editFrame.height
+            drag.onActiveChanged: toggleDragState(drag.active, resizeBottomRightCorner)
         }
     }
 }
