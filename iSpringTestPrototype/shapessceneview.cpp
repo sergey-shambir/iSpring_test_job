@@ -28,6 +28,8 @@ ShapesSceneView::~ShapesSceneView() = default;
 void ShapesSceneView::paint(QPainter *painter)
 {
     painter->setRenderHint(QPainter::Antialiasing);
+    painter->setRenderHint(QPainter::SmoothPixmapTransform);
+    painter->setRenderHint(QPainter::HighQualityAntialiasing);
 
     QPen qPen{QColor(Qt::red)};
     qPen.setWidthF(PEN_WIDTH);

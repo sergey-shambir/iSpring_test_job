@@ -95,123 +95,128 @@ ShapesSceneView {
         acceptedButtons: Qt.LeftButton
         onClicked: parent.clicked(mouse.x, mouse.y)
     }
-    Item {
-        id: editFrame
-        visible: false
-        focus: visible
-        Keys.onDeletePressed: deletePickedNode()
-        MouseArea {
-            anchors.fill: parent
-            id: dragArea
-            acceptedButtons: Qt.LeftButton
-            cursorShape: pressed ? Qt.ClosedHandCursor : Qt.OpenHandCursor
-            drag.target: editFrame
-            drag.axis: Drag.XAndYAxis
-            drag.minimumX: 0
-            drag.minimumY: 0
-            drag.maximumX: root.width - editFrame.width
-            drag.maximumY: root.height - editFrame.height
-            drag.onActiveChanged: toggleDragState(drag.active, movePickedNode)
-        }
-        MouseArea {
-            id: edgeLeft
-            x: -2
-            y: -2
-            width: 4
-            height: parent.height + 4
-            cursorShape: Qt.SizeHorCursor
-            drag.axis: Drag.XAxis
-            drag.target: editFrame
-            drag.minimumX: 0
-            drag.onActiveChanged: toggleDragState(drag.active, resizeLeftEdge)
-        }
-        MouseArea {
-            id: edgeRight
-            x: parent.width - 2
-            y: -2
-            width: 4
-            height: parent.height + 4
-            cursorShape: Qt.SizeHorCursor
-            drag.axis: Drag.XAxis
-            drag.target: editFrame
-            drag.maximumX: root.width - editFrame.width
-            drag.onActiveChanged: toggleDragState(drag.active, resizeRightEdge)
-        }
-        MouseArea {
-            id: edgeTop
-            x: -2
-            y: -2
-            width: parent.width + 4
-            height: 4
-            cursorShape: Qt.SizeVerCursor
-            drag.axis: Drag.YAxis
-            drag.target: editFrame
-            drag.minimumY: 0
-            drag.onActiveChanged: toggleDragState(drag.active, resizeTopEdge)
-        }
-        MouseArea {
-            id: edgeBottom
-            x: -2
-            y: parent.height - 2
-            width: parent.width + 4
-            height: 4
-            cursorShape: Qt.SizeVerCursor
-            drag.axis: Drag.YAxis
-            drag.target: editFrame
-            drag.maximumY: root.height - editFrame.height
-            drag.onActiveChanged: toggleDragState(drag.active, resizeBottomEdge)
-        }
-        MouseArea {
-            id: cornerTopLeft
-            cursorShape: Qt.SizeFDiagCursor
-            x: -4
-            y: -4
-            width: 8
-            height: 8
-            drag.axis: Drag.XAndYAxis
-            drag.target: editFrame
-            drag.minimumX: 0
-            drag.minimumY: 0
-            drag.onActiveChanged: toggleDragState(drag.active, resizeTopLeftCorner)
-        }
-        MouseArea {
-            id: cornerBottomLeft
-            cursorShape: Qt.SizeBDiagCursor
-            x: -4
-            y: editFrame.height - 4
-            width: 8
-            height: 8
-            drag.axis: Drag.XAndYAxis
-            drag.target: editFrame
-            drag.minimumX: 0
-            drag.maximumY: root.height - editFrame.height
-            drag.onActiveChanged: toggleDragState(drag.active, resizeBottomLeftCorner)
-        }
-        MouseArea {
-            id: cornerTopRight
-            cursorShape: Qt.SizeBDiagCursor
-            x: editFrame.width - 4
-            y: -4
-            width: 8
-            height: 8
-            drag.axis: Drag.XAndYAxis
-            drag.target: editFrame
-            drag.maximumX: root.width - editFrame.width
-            drag.minimumY: 0
-            drag.onActiveChanged: toggleDragState(drag.active, resizeTopRightCorner)
-        }
-        MouseArea {
-            id: cornerBottomRight
-            cursorShape: Qt.SizeFDiagCursor
-            x: editFrame.width - 4
-            y: editFrame.height - 4
-            width: 8
-            height: 8
-            drag.axis: Drag.XAndYAxis
-            drag.target: editFrame
-            drag.maximumX: root.width - editFrame.width
-            drag.maximumY: root.height - editFrame.height
-            drag.onActiveChanged: toggleDragState(drag.active, resizeBottomRightCorner)
+    FocusScope {
+        Item {
+            id: editFrame
+            visible: false
+            onVisibleChanged: {
+                if (visible) forceActiveFocus()
+            }
+            focus: true
+            Keys.onDeletePressed: deletePickedNode()
+            MouseArea {
+                anchors.fill: parent
+                id: dragArea
+                acceptedButtons: Qt.LeftButton
+                cursorShape: pressed ? Qt.ClosedHandCursor : Qt.OpenHandCursor
+                drag.target: editFrame
+                drag.axis: Drag.XAndYAxis
+                drag.minimumX: 0
+                drag.minimumY: 0
+                drag.maximumX: root.width - editFrame.width
+                drag.maximumY: root.height - editFrame.height
+                drag.onActiveChanged: toggleDragState(drag.active, movePickedNode)
+            }
+            MouseArea {
+                id: edgeLeft
+                x: -2
+                y: -2
+                width: 4
+                height: parent.height + 4
+                cursorShape: Qt.SizeHorCursor
+                drag.axis: Drag.XAxis
+                drag.target: editFrame
+                drag.minimumX: 0
+                drag.onActiveChanged: toggleDragState(drag.active, resizeLeftEdge)
+            }
+            MouseArea {
+                id: edgeRight
+                x: parent.width - 2
+                y: -2
+                width: 4
+                height: parent.height + 4
+                cursorShape: Qt.SizeHorCursor
+                drag.axis: Drag.XAxis
+                drag.target: editFrame
+                drag.maximumX: root.width - editFrame.width
+                drag.onActiveChanged: toggleDragState(drag.active, resizeRightEdge)
+            }
+            MouseArea {
+                id: edgeTop
+                x: -2
+                y: -2
+                width: parent.width + 4
+                height: 4
+                cursorShape: Qt.SizeVerCursor
+                drag.axis: Drag.YAxis
+                drag.target: editFrame
+                drag.minimumY: 0
+                drag.onActiveChanged: toggleDragState(drag.active, resizeTopEdge)
+            }
+            MouseArea {
+                id: edgeBottom
+                x: -2
+                y: parent.height - 2
+                width: parent.width + 4
+                height: 4
+                cursorShape: Qt.SizeVerCursor
+                drag.axis: Drag.YAxis
+                drag.target: editFrame
+                drag.maximumY: root.height - editFrame.height
+                drag.onActiveChanged: toggleDragState(drag.active, resizeBottomEdge)
+            }
+            MouseArea {
+                id: cornerTopLeft
+                cursorShape: Qt.SizeFDiagCursor
+                x: -4
+                y: -4
+                width: 8
+                height: 8
+                drag.axis: Drag.XAndYAxis
+                drag.target: editFrame
+                drag.minimumX: 0
+                drag.minimumY: 0
+                drag.onActiveChanged: toggleDragState(drag.active, resizeTopLeftCorner)
+            }
+            MouseArea {
+                id: cornerBottomLeft
+                cursorShape: Qt.SizeBDiagCursor
+                x: -4
+                y: editFrame.height - 4
+                width: 8
+                height: 8
+                drag.axis: Drag.XAndYAxis
+                drag.target: editFrame
+                drag.minimumX: 0
+                drag.maximumY: root.height - editFrame.height
+                drag.onActiveChanged: toggleDragState(drag.active, resizeBottomLeftCorner)
+            }
+            MouseArea {
+                id: cornerTopRight
+                cursorShape: Qt.SizeBDiagCursor
+                x: editFrame.width - 4
+                y: -4
+                width: 8
+                height: 8
+                drag.axis: Drag.XAndYAxis
+                drag.target: editFrame
+                drag.maximumX: root.width - editFrame.width
+                drag.minimumY: 0
+                drag.onActiveChanged: toggleDragState(drag.active, resizeTopRightCorner)
+            }
+            MouseArea {
+                id: cornerBottomRight
+                cursorShape: Qt.SizeFDiagCursor
+                x: editFrame.width - 4
+                y: editFrame.height - 4
+                width: 8
+                height: 8
+                drag.axis: Drag.XAndYAxis
+                drag.target: editFrame
+                drag.maximumX: root.width - editFrame.width
+                drag.maximumY: root.height - editFrame.height
+                drag.onActiveChanged: toggleDragState(drag.active, resizeBottomRightCorner)
+            }
         }
     }
 }
