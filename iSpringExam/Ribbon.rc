@@ -1,0 +1,36 @@
+// ******************************************************************************
+// * This is an automatically generated file containing the ribbon resource for *
+// * your application.                                                          *
+// ******************************************************************************
+
+#include ".\Ribbon.h"
+
+STRINGTABLE 
+BEGIN
+    ID_INSERT_TRIANGLE_LabelTitle_RESID L"Insert Triangle" /* LabelTitle ID_INSERT_TRIANGLE_LabelTitle_RESID: (null) */
+END
+
+ID_INSERT_TRIANGLE_LargeImages_RESID    BITMAP    "res\\button-triangle.bmp" /* LargeImages ID_INSERT_TRIANGLE_LargeImages_RESID: (null) */
+STRINGTABLE 
+BEGIN
+    ID_INSERT_RECTANGLE_LabelTitle_RESID L"Insert Rectangle" /* LabelTitle ID_INSERT_RECTANGLE_LabelTitle_RESID: (null) */
+END
+
+ID_INSERT_RECTANGLE_LargeImages_RESID    BITMAP    "res\\button-rectangle.bmp" /* LargeImages ID_INSERT_RECTANGLE_LargeImages_RESID: (null) */
+STRINGTABLE 
+BEGIN
+    ID_INSERT_ELLIPSE_LabelTitle_RESID L"Insert Ellipse" /* LabelTitle ID_INSERT_ELLIPSE_LabelTitle_RESID: (null) */
+END
+
+ID_INSERT_ELLIPSE_LargeImages_RESID    BITMAP    "res\\button-ellipse.bmp" /* LargeImages ID_INSERT_ELLIPSE_LargeImages_RESID: (null) */
+STRINGTABLE 
+BEGIN
+    ID_TAB_INSERT_LabelTitle_RESID L"Insert" /* LabelTitle ID_TAB_INSERT_LabelTitle_RESID: (null) */
+END
+
+STRINGTABLE 
+BEGIN
+    ID_GROUP_INSERT_SHAPE_LabelTitle_RESID L"Insert Shape" /* LabelTitle ID_GROUP_INSERT_SHAPE_LabelTitle_RESID: (null) */
+END
+
+APPLICATION_RIBBON    UIFILE    "Ribbon.bml"
