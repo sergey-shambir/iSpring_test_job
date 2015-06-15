@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "abstractnode.h"
 
 static const int DEFAULT_MINIMAL_SIZE = 40;
@@ -9,7 +10,7 @@ const rectangle &AbstractNode::boundingRect() const
 
 vec2 AbstractNode::minimalSize() const
 {
-    return vec2(DEFAULT_MINIMAL_SIZE, DEFAULT_MINIMAL_SIZE);
+    return vec2(float(DEFAULT_MINIMAL_SIZE), float(DEFAULT_MINIMAL_SIZE));
 }
 
 void AbstractNode::resizeTo(const vec2 &boundingSize)

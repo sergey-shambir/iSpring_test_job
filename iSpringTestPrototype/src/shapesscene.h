@@ -24,7 +24,10 @@ public:
     const NodePtr &pickedNode() const;
 
     void doCommand(const AbstractShapeCommandPtr &command);
+	void onDidSave();
     bool addFromJson(const json11::Json &json, std::string &incorrectJson);
+	bool addFromJsonFile(const std::string &path, std::string &errorReason);
+	bool saveToJsonFile(const std::string &path, std::string &errorReason) const;
     void render(AbstractNode::RenderContext &context);
     void clearScene();
     void setUpdateCallback(const UpdateCallback &callback);

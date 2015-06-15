@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "rectanglenode.h"
 
 const char *RectangleNode::CLASS_NAME = "Rectangle";

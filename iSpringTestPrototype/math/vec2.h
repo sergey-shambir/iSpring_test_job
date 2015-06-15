@@ -9,7 +9,9 @@ public:
     treal x;
     treal y;
 
-    inline explicit vec2(treal vx = 0.0, treal vy = 0.0)
+	inline explicit vec2()
+		: x(0.f), y(0.f) { }
+    inline explicit vec2(treal vx, treal vy)
         : x(vx), y(vy) { }
     inline explicit vec2(treal *array)
         : x(array[0]), y(array[1]) { }
@@ -101,6 +103,12 @@ template <class treal>
 float dot(const base::vec2<treal> &left, const base::vec2<treal> &right)
 {
     return left.x * right.x + left.y * right.y;
+}
+
+template <class treal>
+base::vec2<treal> operator *(const treal &left, const base::vec2<treal> &right)
+{
+	return base::vec2<treal>(left * right.x, left * right.y);
 }
 
 typedef base::vec2<float> vec2;

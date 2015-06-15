@@ -1,7 +1,7 @@
 #pragma once
 #include "../math/math"
 #include "json11.hpp"
-#include <gdiplus.h>
+#include "gdiplus.h"
 #include <memory>
 
 class AbstractNode
@@ -9,18 +9,16 @@ class AbstractNode
 public:
     struct RenderContext
     {
-        RenderContext(GDIPlus::Pen &pen,
-                      GDIPlus::Brush &brush,
-                      GDIPlus::Graphics &graphics)
+        RenderContext(Gdiplus::Pen &pen, Gdiplus::Brush &brush, Gdiplus::Graphics &graphics)
             : pen(pen)
             , brush(brush)
             , graphics(graphics)
         {
         }
 
-        GDIPlus::Pen &pen;
-        GDIPlus::Brush &brush;
-        GDIPlus::Graphics &graphics;
+		Gdiplus::Pen &pen;
+		Gdiplus::Brush &brush;
+		Gdiplus::Graphics &graphics;
     };
 
     virtual ~AbstractNode() = default;
@@ -34,9 +32,7 @@ public:
     virtual void resizeTo(const vec2 &boundingSize);
     virtual void moveTo(const vec2 &toPoint);
     virtual void moveBy(const vec2 &delta);
-
-protected:
-    void setBoundingRect(const rectangle &rect);
+    virtual void setBoundingRect(const rectangle &rect);
 
 private:
     rectangle m_boundingRect;

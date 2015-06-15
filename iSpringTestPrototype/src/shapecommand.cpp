@@ -1,3 +1,5 @@
+
+#include "stdafx.h"
 #include "shapecommand.h"
 #include "trianglenode.h"
 #include "rectanglenode.h"
@@ -37,7 +39,7 @@ bool InsertShapeCommand::redo(IShapeSceneControl &scene)
     }
     const int halfSize = DEFAULT_SIZE / 2;
     m_createdNode->moveTo(vec2(0.5f * (scene.width() - halfSize), 0.5f * (scene.height() - halfSize)));
-    m_createdNode->resizeTo(vec2(DEFAULT_SIZE, DEFAULT_SIZE));
+    m_createdNode->resizeTo(vec2(float(DEFAULT_SIZE), float(DEFAULT_SIZE)));
     scene.insertNode(m_createdNode);
     return true;
 }
@@ -78,8 +80,7 @@ bool SetShapeBoundsCommand::redo(IShapeSceneControl &scene)
             return false;
     }
     m_oldBounds = m_targetNode->boundingRect();
-    m_targetNode->moveTo(m_newBounds.origin());
-    m_targetNode->resizeTo(m_newBounds.size());
+    m_targetNode->setBoundingRect(m_newBounds);
     return true;
 }
 

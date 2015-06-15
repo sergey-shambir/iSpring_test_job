@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "ellipsenode.h"
 
 const char *EllipseNode::CLASS_NAME = "Ellipse";
@@ -30,7 +31,7 @@ json11::Json EllipseNode::toJson() const
 void EllipseNode::render(RenderContext &context) const
 {
     const rectangle &br = boundingRect();
-    GDIPlus::RectF rect{br.x, br.y, br.width, br.height};
+    Gdiplus::RectF rect{br.x, br.y, br.width, br.height};
     context.graphics.FillEllipse(&context.brush, rect);
     context.graphics.DrawEllipse(&context.pen, rect);
 }

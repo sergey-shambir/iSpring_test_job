@@ -1,8 +1,10 @@
 QT += quick widgets
 CONFIG += c++11
 
+INCLUDEPATH += $$PWD
+
 *linux-*{
-    INCLUDEPATH += GDIPlus_fake
+    INCLUDEPATH += $$PWD/GDIPlus_fake
     HEADERS += \
         GDIPlus_fake/gdiplus.h
 

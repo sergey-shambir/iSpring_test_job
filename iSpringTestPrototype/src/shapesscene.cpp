@@ -1,7 +1,10 @@
+
+#include "stdafx.h"
 #include "shapesscene.h"
 #include "ellipsenode.h"
 #include "trianglenode.h"
 #include "rectanglenode.h"
+#include <array>
 
 class ShapesScenePrivate : public IShapeSceneControl
 {
@@ -15,10 +18,11 @@ public:
 
     std::list<NodePtr> m_nodes;
     std::vector<AbstractShapeCommandPtr> m_history;
-    size_t m_usedHistorySize = 0;
+	size_t m_usedHistorySize = 0;
+    size_t m_savedHistorySize = 0;
+	bool m_didAlteredHistory = false;
     std::pair<int, int> m_size;
     std::pair<int, int> m_minimalSize;
-    bool m_isModified = false;
     ShapesScene::UpdateCallback m_updateCallback;
     NodePtr m_pickedNode;
 };
@@ -78,20 +82,28 @@ ShapesScene::~ShapesScene()
 
 bool ShapesScene::isModified() const
 {
-    return d->m_isModified;
+    return d->m_didAlteredHistory || (d->m_savedHistorySize != d->m_usedHistorySize);
 }
 
 void ShapesScene::doCommand(const AbstractShapeCommandPtr &command)
 {
-    if (command->redo(*d)) {
-        if (d->m_history.size() > d->m_usedHistorySize) {
-            d->m_history.resize(d->m_usedHistorySize);
-        }
+	if (command->redo(*d)) {
+		if (d->m_history.size() > d->m_usedHistorySize) {
+			d->m_history.resize(d->m_usedHistorySize);
+			if (d->m_savedHistorySize > d->m_usedHistorySize)
+				d->m_didAlteredHistory = true;
+		}
         d->m_history.push_back(command);
         d->m_usedHistorySize = d->m_history.size();
-        d->m_updateCallback();
-        d->m_isModified = true; // TODO: remember index of command for which scene was unmodified
+		if (d->m_updateCallback)
+			d->m_updateCallback();
     }
+}
+
+void ShapesScene::onDidSave()
+{
+	d->m_didAlteredHistory = false;
+	d->m_savedHistorySize = d->m_usedHistorySize;
 }
 
 json11::Json ShapesScene::toJson() const
@@ -128,8 +140,55 @@ bool ShapesScene::addFromJson(const json11::Json &json, std::string &incorrectJs
             return false;
         }
     }
-    d->m_updateCallback();
     return true;
+}
+
+bool ShapesScene::addFromJsonFile(const std::string &path, std::string &errorReason)
+{
+	json11::Json json;
+	if (FILE *file = fopen(path.c_str(), "r")) {
+		std::string jsonContent;
+		std::array<char, 64 * 1024> buffer;
+		while (size_t len = fread(buffer.data(), sizeof(char), buffer.size(), file))
+			jsonContent.append(buffer.data(), len);
+		if (ferror(file)) {
+			fclose(file);
+			errorReason = "Failed to completely read scene file content";
+			return false;
+		}
+		fclose(file);
+		json = json11::Json::parse(jsonContent, errorReason);
+		if (json.is_null())
+			return false;
+	} else {
+		errorReason = "Failed to read scene file content";
+		return false;
+	}
+	std::string incorrectJson;
+	if (!addFromJson(json, incorrectJson)) {
+		errorReason = "Scene file corrupted, incorrect JSON part: " + incorrectJson;
+		return false;
+	}
+	return true;
+}
+
+bool ShapesScene::saveToJsonFile(const std::string &path, std::string &errorReason) const
+{
+	if (FILE *file = fopen(path.c_str(), "w")) {
+		std::string content;
+		json11::Json json{ *this };
+		json.dump(content);
+		size_t len = fwrite(content.c_str(), sizeof(char), content.size(), file);
+		fclose(file);
+		if (len != content.size()) {
+			errorReason = "Failed to finish writing scene file";
+			return false;
+		}
+	} else {
+		errorReason = "Failed to write scene file";
+		return false;
+	}
+	return true;
 }
 
 void ShapesScene::render(AbstractNode::RenderContext &context)
@@ -145,7 +204,8 @@ void ShapesScene::clearScene()
     d->m_history.clear();
     d->m_pickedNode.reset();
     d->m_size = d->m_minimalSize;
-    d->m_updateCallback();
+	if (d->m_updateCallback)
+		d->m_updateCallback();
 }
 
 void ShapesScene::setUpdateCallback(const ShapesScene::UpdateCallback &callback)
@@ -155,7 +215,7 @@ void ShapesScene::setUpdateCallback(const ShapesScene::UpdateCallback &callback)
 
 bool ShapesScene::pickNode(int x, int y)
 {
-    vec2 point(x, y);
+	vec2 point{ float(x), float(y) };
     for (auto it = d->m_nodes.rbegin(); it != d->m_nodes.rend(); ++it) {
         if ((*it)->testHit(point)) {
             d->m_pickedNode = (*it);
@@ -170,8 +230,10 @@ void ShapesScene::setMinimalSize(int width, int height)
 {
     d->m_minimalSize.first = width;
     d->m_minimalSize.second = height;
-    d->m_size.first = std::max(d->m_size.first, d->m_minimalSize.first);
-    d->m_size.second = std::max(d->m_size.second, d->m_minimalSize.second);
+	if (d->m_size.first < d->m_minimalSize.first)
+		d->m_size.first = d->m_minimalSize.first;
+	if (d->m_size.second < d->m_minimalSize.second)
+		d->m_size.second = d->m_minimalSize.second;
 }
 
 void ShapesScene::undo()
@@ -179,7 +241,8 @@ void ShapesScene::undo()
     if (isUndoable()) {
         AbstractShapeCommandPtr command = d->m_history[d->m_usedHistorySize - 1];
         if (command->undo(*d)) {
-            --d->m_usedHistorySize;
+			--d->m_usedHistorySize;
+			d->m_updateCallback();
         }
     }
 }
@@ -189,7 +252,8 @@ void ShapesScene::redo()
     if (isRedoable()) {
         AbstractShapeCommandPtr command = d->m_history[d->m_usedHistorySize];
         if (command->redo(*d)) {
-            ++d->m_usedHistorySize;
+			++d->m_usedHistorySize;
+			d->m_updateCallback();
         }
     }
 }

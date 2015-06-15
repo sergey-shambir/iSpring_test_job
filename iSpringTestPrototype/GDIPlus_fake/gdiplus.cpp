@@ -1,7 +1,7 @@
 #include "gdiplus.h"
 #include <QPainter>
 
-namespace GDIPlus {
+namespace Gdiplus {
 
 Graphics::Graphics(QPainter *painter)
     : m_painter(painter)
@@ -89,7 +89,7 @@ RectF::RectF()
 {
 }
 
-RectF::RectF(const GDIPlus::PointF &pos, const GDIPlus::SizeF &size)
+RectF::RectF(const PointF &pos, const SizeF &size)
     : m_qRect(pos.qPoint(), size.qSize())
 {
 }

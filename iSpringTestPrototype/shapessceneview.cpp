@@ -33,9 +33,9 @@ void ShapesSceneView::paint(QPainter *painter)
 
     QPen qPen{QColor(Qt::red)};
     qPen.setWidthF(PEN_WIDTH);
-    GDIPlus::Pen pen{qPen};
-    GDIPlus::Brush brush{QBrush(QColor(Qt::yellow))};
-    GDIPlus::Graphics graphics{painter};
+    Gdiplus::Pen pen{qPen};
+    Gdiplus::Brush brush{QBrush(QColor(Qt::yellow))};
+    Gdiplus::Graphics graphics{painter};
     AbstractNode::RenderContext context{pen, brush, graphics};
     m_scene->render(context);
 
@@ -98,6 +98,7 @@ void ShapesSceneView::openDocument()
         m_documentPath = path;
         emit editFrameDisappeared();
     }
+    updateSceneAndUi();
 }
 
 void ShapesSceneView::saveDocument()

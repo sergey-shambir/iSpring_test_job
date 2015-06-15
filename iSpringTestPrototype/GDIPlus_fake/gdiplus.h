@@ -7,7 +7,7 @@ QT_BEGIN_NAMESPACE
 class QPainter;
 QT_END_NAMESPACE
 
-namespace GDIPlus {
+namespace Gdiplus {
 
 class Graphics;
 class PointF;

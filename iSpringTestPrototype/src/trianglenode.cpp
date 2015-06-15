@@ -1,3 +1,5 @@
+
+#include "stdafx.h"
 #include "trianglenode.h"
 
 const char *TriangleNode::CLASS_NAME = "Triangle";
@@ -35,10 +37,10 @@ json11::Json TriangleNode::toJson() const
 void TriangleNode::render(RenderContext &context) const
 {
     const rectangle &br = boundingRect();
-    GDIPlus::PointF points[3];
-    points[0] = GDIPlus::PointF(br.x, br.y + br.height);
-    points[1] = GDIPlus::PointF(br.x + 0.5f * br.width, br.y);
-    points[2] = GDIPlus::PointF(br.x + br.width, br.y + br.height);
+	Gdiplus::PointF points[3];
+	points[0] = Gdiplus::PointF(br.x, br.y + br.height);
+	points[1] = Gdiplus::PointF(br.x + 0.5f * br.width, br.y);
+	points[2] = Gdiplus::PointF(br.x + br.width, br.y + br.height);
     context.graphics.FillPolygon(&context.brush, points, 3);
     context.graphics.DrawPolygon(&context.pen, points, 3);
 }
