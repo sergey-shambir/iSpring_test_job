@@ -83,15 +83,19 @@ void ShapeEditFrame::UpdateMousePos(int x, int y)
 	if (!m_isVisible)
 		return;
 	if (m_isInDragState) {
+		if (m_cursorNeedsReset) {
+			m_cursorNeedsReset = false;
+			::SetCursor(LoadCursorForZone(m_currentZone));
+		}
 		ApplyDragChanges(x, y);
 	} else {
 		UpdateCurrentZone(x, y);
 	}
 }
 
-void ShapeEditFrame::ForceZoneOutside()
+void ShapeEditFrame::DropCustomCursor()
 {
-	m_currentZone = Outside;
+	m_cursorNeedsReset = true;
 }
 
 void ShapeEditFrame::ShowInRect(const rectangle &bounds)
@@ -102,7 +106,7 @@ void ShapeEditFrame::ShowInRect(const rectangle &bounds)
 
 void ShapeEditFrame::Hide()
 {
-	ForceZoneOutside();
+	m_currentZone = Outside;
 	SetBounds(rectangle(0, 0, 0, 0));
 	m_isVisible = false;
 }
@@ -160,7 +164,8 @@ void ShapeEditFrame::ApplyDragChanges(int x, int y)
 void ShapeEditFrame::UpdateCurrentZone(int x, int y)
 {
 	Zone zone = DetectZone(x, y);
-	if (zone != m_currentZone) {
+	if (zone != m_currentZone || m_cursorNeedsReset) {
+		m_cursorNeedsReset = false;
 		m_currentZone = zone;
 		::SetCursor(LoadCursorForZone(m_currentZone));
 	}

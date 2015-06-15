@@ -3,22 +3,10 @@
 
 CBackBuffer::CBackBuffer()
 {
-	/*
-	parent.GetClipBox(&m_rect);
-	CreateCompatibleDC(parent);
-	m_bitmap.CreateCompatibleBitmap(parent, m_rect.Width(), m_rect.Height());
-	m_savedBitmap = static_cast<HBITMAP>(::SelectObject(*this, &m_bitmap));
-	SetWindowOrg(m_rect.left, m_rect.top);
-	*/
 }
 
 CBackBuffer::~CBackBuffer()
 {
-	/*
-	m_parent.BitBlt(m_rect.left, m_rect.top, m_rect.Width(), m_rect.Height(),
-		*this, m_rect.left, m_rect.top, SRCCOPY);
-	SelectObject(*this, m_savedBitmap);
-	*/
 }
 
 std::unique_ptr<Gdiplus::Graphics> CBackBuffer::StartRender()

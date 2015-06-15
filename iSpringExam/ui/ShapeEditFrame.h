@@ -32,7 +32,7 @@ public:
 	bool StartDrag(int x, int y);
 	void FinishDrag();
 	void UpdateMousePos(int x, int y);
-	void ForceZoneOutside();
+	void DropCustomCursor();
 	void ShowInRect(const rectangle &bounds);
 	void Hide();
 
@@ -47,6 +47,7 @@ private:
 	std::map<LPCTSTR, HCURSOR> m_cursors;
 	bool m_isVisible = true;
 	bool m_isInDragState = false;
+	bool m_cursorNeedsReset = false;
 	int m_lastX = 0;
 	int m_lastY = 0;
 	Zone m_currentZone = Outside;

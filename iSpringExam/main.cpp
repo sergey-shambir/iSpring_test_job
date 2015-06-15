@@ -13,6 +13,11 @@
 #include "ui/aboutdlg.h"
 #include "ui/MainFrm.h"
 
+namespace {
+	const int WINDOW_WIDTH = 1200;
+	const int WINDOW_HEIGHT = 800;
+} // anonymous namespace
+
 CAppModule _Module;
 
 int Run(LPTSTR /*lpstrCmdLine*/ = NULL, int nCmdShow = SW_SHOWDEFAULT)
@@ -27,6 +32,7 @@ int Run(LPTSTR /*lpstrCmdLine*/ = NULL, int nCmdShow = SW_SHOWDEFAULT)
 		ATLTRACE(_T("Main window creation failed!\n"));
 		return 0;
 	}
+	wndMain.ResizeClient(WINDOW_WIDTH, WINDOW_HEIGHT);
 
 	wndMain.ShowWindow(nCmdShow);
 

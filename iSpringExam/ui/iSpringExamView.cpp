@@ -126,7 +126,7 @@ LRESULT CISpringExamView::OnPaint(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lPa
 LRESULT CISpringExamView::OnResize(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM lParam, BOOL& /*bHandled*/)
 {
 	const int width = LOWORD(lParam);
-	const int height = HIWORD(lParam);
+    const int height = HIWORD(lParam);
 	m_scene->setMinimalSize(width, height);
 	m_backBuffer->SetSize(Gdiplus::Size(width, height));
 	return 0;
@@ -210,8 +210,7 @@ LRESULT CISpringExamView::OnMouseMove(UINT /*uMsg*/, WPARAM wParam, LPARAM lPara
 
 LRESULT CISpringExamView::OnMouseLeave(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM lParam, BOOL& /*bHandled*/)
 {
-	m_editFrame.ForceZoneOutside();
-
+	m_editFrame.DropCustomCursor();
 	return 0;
 }
 
