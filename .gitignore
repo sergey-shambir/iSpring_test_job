@@ -26,3 +26,11 @@
 *.exe
 *.out
 *.app
+*.ipch
+*.pdb
+*.opensdf
+iSpringExam/Debug/*
+*.bml
+*.sdf
+iSpringExam.v12.suo
+*.ilk
