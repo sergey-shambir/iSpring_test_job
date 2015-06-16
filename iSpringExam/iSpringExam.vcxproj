@@ -55,11 +55,11 @@
       <PreprocessorDefinitions>WIN32;_WINDOWS;STRICT;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <DelayLoadDLLs>propsys.dll;dwmapi.dll;gdiplus.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
-      <AdditionalDependencies>gdiplus.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>gdiplus.lib;d2d1.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <EntryPointSymbol>
       </EntryPointSymbol>
     </Link>
@@ -93,6 +93,7 @@
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
       <DelayLoadDLLs>propsys.dll;dwmapi.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
+      <AdditionalDependencies>gdiplus.lib;d2d1.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ResourceCompile>
       <Culture>0x0409</Culture>
@@ -112,9 +113,10 @@
     </Midl>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="render\Direct2DRenderer.cpp" />
     <ClCompile Include="render\AbstractVGRenderer.cpp" />
     <ClCompile Include="render\GdiplusRenderer.cpp" />
-    <ClCompile Include="ui\BackBuffer.cpp" />
+    <ClCompile Include="render\GdiplusBackBuffer.cpp" />
     <ClCompile Include="ui\AboutDlg.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ui\ShapeEditFrame.cpp" />
@@ -134,10 +136,11 @@
     <ClCompile Include="ui\CustomDialogs.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="render\Direct2DRenderer.h" />
     <ClInclude Include="render\AbstractVGRenderer.h" />
     <ClInclude Include="render\GdiplusRenderer.h" />
     <ClInclude Include="render\IVGRenderer.h" />
-    <ClInclude Include="ui\BackBuffer.h" />
+    <ClInclude Include="render\GdiplusBackBuffer.h" />
     <ClInclude Include="ui\AboutDlg.h" />
     <ClInclude Include="ui\ShapeEditFrame.h" />
     <ClInclude Include="ui\iSpringExamView.h" />

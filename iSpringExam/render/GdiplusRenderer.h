@@ -2,12 +2,20 @@
 #include "AbstractVGRenderer.h"
 #include <gdiplus.h>
 #include <memory>
+#include <vector>
+#include <gdiplus.h>
 
-class GdiplusRenderer : public AbstractVGRenderer
+class CGdiplusBackBuffer;
+
+class CGdiplusRenderer : public AbstractVGRenderer
 {
 public:
-    explicit GdiplusRenderer(Gdiplus::Graphics &graphics);
-    ~GdiplusRenderer();
+    explicit CGdiplusRenderer();
+    ~CGdiplusRenderer();
+
+    void StartFrameRender();
+    void EndFrameRender(HDC deviceContext);
+    void OnWindowResize(int width, int height);
 
     void SetPen(const VGPen &pen) override;
     void SetBrush(const VGBrush &brush) override;
@@ -22,5 +30,6 @@ private:
 
     Gdiplus::Pen m_apiPen;
     std::unique_ptr<Gdiplus::Brush> m_apiBrush;
-    Gdiplus::Graphics &m_apiGraphics;
+    std::unique_ptr<Gdiplus::Graphics> m_backGraphics;
+    std::unique_ptr<CGdiplusBackBuffer> m_backBuffer;
 };

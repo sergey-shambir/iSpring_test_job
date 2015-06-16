@@ -5,9 +5,8 @@
 #pragma once
 #include "../shapes/shapesscene.h"
 #include "ShapeEditFrame.h"
-#include <gdiplus.h>
 
-class CBackBuffer;
+class CGdiplusRenderer;
 
 class CISpringExamView : public CWindowImpl<CISpringExamView>
 {
@@ -64,7 +63,7 @@ private:
 	bool SaveDocumentToPath(const std::string &path);
 
 	std::unique_ptr<ShapesScene> m_scene;
-	std::unique_ptr<CBackBuffer> m_backBuffer;
+	std::unique_ptr<CGdiplusRenderer> m_gdiplusRenderer;
 	std::string m_sceneSavePath;
 	ShapeEditFrame m_editFrame;
 	rectangle m_pickedBoundsBeforeDrag;

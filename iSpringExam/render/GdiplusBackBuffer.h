@@ -1,11 +1,11 @@
 #pragma once
 #include <gdiplus.h>
 
-class CBackBuffer
+class CGdiplusBackBuffer
 {
 public:
-	CBackBuffer();
-	~CBackBuffer();
+    CGdiplusBackBuffer();
+    ~CGdiplusBackBuffer();
 	
 	std::unique_ptr<Gdiplus::Graphics> StartRender();
 	void SetSize(const Gdiplus::Size &size);

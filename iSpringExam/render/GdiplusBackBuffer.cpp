@@ -1,15 +1,15 @@
 #include "stdafx.h"
-#include "BackBuffer.h"
+#include "GdiplusBackBuffer.h"
 
-CBackBuffer::CBackBuffer()
+CGdiplusBackBuffer::CGdiplusBackBuffer()
 {
 }
 
-CBackBuffer::~CBackBuffer()
+CGdiplusBackBuffer::~CGdiplusBackBuffer()
 {
 }
 
-std::unique_ptr<Gdiplus::Graphics> CBackBuffer::StartRender()
+std::unique_ptr<Gdiplus::Graphics> CGdiplusBackBuffer::StartRender()
 {
 	if (!m_bitmap) {
 		m_bitmap.reset(new Gdiplus::Bitmap(m_size.Width, m_size.Height));
@@ -20,7 +20,7 @@ std::unique_ptr<Gdiplus::Graphics> CBackBuffer::StartRender()
 	return ret;
 }
 
-void CBackBuffer::SetSize(const Gdiplus::Size &size)
+void CGdiplusBackBuffer::SetSize(const Gdiplus::Size &size)
 {
 	if (m_size.Width != size.Width || m_size.Height != size.Height) {
 		m_size = size;
@@ -28,7 +28,7 @@ void CBackBuffer::SetSize(const Gdiplus::Size &size)
 	}
 }
 
-Gdiplus::Bitmap *CBackBuffer::GetBitmap() const
+Gdiplus::Bitmap *CGdiplusBackBuffer::GetBitmap() const
 {
 	return m_bitmap.get();
 }

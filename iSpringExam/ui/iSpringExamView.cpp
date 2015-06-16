@@ -10,10 +10,11 @@
 #include "../shapes/trianglenode.h"
 #include "../shapes/rectanglenode.h"
 #include "../shapes/ellipsenode.h"
-#include "BackBuffer.h"
 #include "../render/GdiplusRenderer.h"
 
-CISpringExamView::CISpringExamView() = default;
+CISpringExamView::CISpringExamView()
+{
+}
 
 CISpringExamView::~CISpringExamView() = default;
 
@@ -92,11 +93,19 @@ void CISpringExamView::InsertRectangle()
 void CISpringExamView::Undo()
 {
 	m_scene->undo();
+    if (auto node = m_scene->pickedNode())
+        m_editFrame.ShowInRect(node->boundingRect());
+    else
+        m_editFrame.Hide();
 }
 
 void CISpringExamView::Redo()
 {
-	m_scene->redo();
+    m_scene->redo();
+    if (auto node = m_scene->pickedNode())
+        m_editFrame.ShowInRect(node->boundingRect());
+    else
+        m_editFrame.Hide();
 }
 
 void CISpringExamView::OnFinalMessage(HWND /*hWnd*/)
@@ -106,20 +115,14 @@ void CISpringExamView::OnFinalMessage(HWND /*hWnd*/)
 
 LRESULT CISpringExamView::OnPaint(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
 {
-    std::unique_ptr<Gdiplus::Graphics> backGraphics{ m_backBuffer->StartRender() };
-    backGraphics->SetSmoothingMode(Gdiplus::SmoothingModeHighQuality);
-    GdiplusRenderer renderer(*backGraphics);
-    renderer.SetPen(VGPen(vec3(1, 0, 0), 2.f));
-    renderer.SetBrush(VGBrush(vec3(1, 1, 0)));
-    m_scene->render(renderer);
-	if (m_scene->pickedNode())
-		m_editFrame.Render(renderer);
-	backGraphics.reset();
-
-	CPaintDC dc(m_hWnd);
-	std::unique_ptr<Gdiplus::Graphics> mainGraphics{ Gdiplus::Graphics::FromHDC(dc.m_hDC) };
-	mainGraphics->DrawImage(m_backBuffer->GetBitmap(), 0, 0);
-	mainGraphics.reset();
+    CPaintDC dc(*this);
+    m_gdiplusRenderer->StartFrameRender();
+    m_gdiplusRenderer->SetPen(VGPen(vec3(1, 0, 0), 2.f));
+    m_gdiplusRenderer->SetBrush(VGBrush(vec3(1, 1, 0)));
+    m_scene->render(*m_gdiplusRenderer);
+    if (m_scene->pickedNode())
+        m_editFrame.Render(*m_gdiplusRenderer);
+    m_gdiplusRenderer->EndFrameRender(dc.m_hDC);
 
 	return 0;
 }
@@ -129,16 +132,16 @@ LRESULT CISpringExamView::OnResize(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM lPar
 	const int width = LOWORD(lParam);
 	const int height = HIWORD(lParam);
 	m_scene->setMinimalSize(width, height);
-	m_backBuffer->SetSize(Gdiplus::Size(width, height));
+    m_gdiplusRenderer->OnWindowResize(width, height);
     m_editFrame.SetSceneBounds(rectangle(0, 0, float(width), float(height)));
 	return 0;
 }
 
 LRESULT CISpringExamView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
 {
+    m_gdiplusRenderer.reset(new CGdiplusRenderer());
 	m_scene.reset(new ShapesScene);
 	InitSceneUpdates();
-	m_backBuffer.reset(new CBackBuffer);
 
 	return 0;
 }
