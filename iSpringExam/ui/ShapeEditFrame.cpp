@@ -1,10 +1,12 @@
 #include "stdafx.h"
 #include "ShapeEditFrame.h"
+#include "../render/AbstractVGRenderer.h"
 
 namespace {
 	const float PEN_WIDTH = 2;
 	const float CORNER_RADIUS = 2;
-	const Gdiplus::Color PEN_COLOR(0x40, 0xa0, 0xff);
+	const vec3 PEN_RGB(0.25f, 0.6f, 1.f);
+    const float MIN_SHAPE_SIZE = 40;
 } // anonymous namespace
 
 ShapeEditFrame::ShapeEditFrame()
@@ -24,6 +26,11 @@ const rectangle &ShapeEditFrame::GetBounds() const
 	return m_bounds;
 }
 
+const rectangle &ShapeEditFrame::GetSceneBounds() const
+{
+    return m_sceneBounds;
+}
+
 bool ShapeEditFrame::IsVisible() const
 {
 	return m_isVisible;
@@ -39,22 +46,28 @@ void ShapeEditFrame::SetBounds(const rectangle &bounds)
 	m_bounds = bounds;
 }
 
+void ShapeEditFrame::SetSceneBounds(const rectangle &bounds)
+{
+    m_sceneBounds = bounds;
+}
+
 void ShapeEditFrame::SetVisible(bool isVisible)
 {
 	m_isVisible = isVisible;
 }
 
-void ShapeEditFrame::Render(Gdiplus::Graphics &graphics)
+void ShapeEditFrame::Render(AbstractVGRenderer &renderer)
 {
 	if (!m_isVisible)
 		return;
 
-	Gdiplus::Pen framePen(PEN_COLOR, float(PEN_WIDTH));
+    renderer.SetBrush(VGBrush(VGBrush::NoBrush));
+    renderer.SetPen(VGPen(PEN_RGB, PEN_WIDTH));
+    renderer.DrawRectangle(m_bounds);
 	const rectangle &br = m_bounds;
-	graphics.DrawRectangle(&framePen, br.x, br.y, br.width, br.height);
 	auto drawCorner = [&](float x, float y) {
-		graphics.DrawEllipse(&framePen, x - CORNER_RADIUS, y - CORNER_RADIUS,
-			2 * CORNER_RADIUS, 2 * CORNER_RADIUS);
+        renderer.DrawEllipse(rectangle(x - CORNER_RADIUS, y - CORNER_RADIUS,
+            2 * CORNER_RADIUS, 2 * CORNER_RADIUS));
 	};
 	drawCorner(br.x, br.y);
 	drawCorner(br.x + br.width, br.y);
@@ -70,6 +83,38 @@ bool ShapeEditFrame::StartDrag(int x, int y)
 	m_isInDragState = true;
 	m_lastX = x;
 	m_lastY = y;
+
+    vec2 dragTopLeft(m_sceneBounds.origin());
+    vec2 dragBottomRight(m_sceneBounds.size());
+    switch (m_currentZone) {
+    case Inside:
+        dragBottomRight.x -= m_bounds.width;
+        dragBottomRight.y -= m_bounds.height;
+        break;
+    case LeftTopCorner:
+    case LeftEdge:
+    case TopEdge:
+        dragBottomRight.x = m_bounds.x + m_bounds.width - MIN_SHAPE_SIZE;
+        dragBottomRight.y = m_bounds.y + m_bounds.height - MIN_SHAPE_SIZE;
+        break;
+    case RightBottomCorner:
+    case RightEdge:
+    case BottomEdge:
+        dragTopLeft.x = m_bounds.x + MIN_SHAPE_SIZE;
+        dragTopLeft.y = m_bounds.y + MIN_SHAPE_SIZE;
+        break;
+    case LeftBottomCorner:
+        dragBottomRight.x = m_bounds.x + m_bounds.width - MIN_SHAPE_SIZE;
+        dragTopLeft.y = m_bounds.y + MIN_SHAPE_SIZE;
+        break;
+    case RightTopCorner:
+        dragTopLeft.x = m_bounds.x + MIN_SHAPE_SIZE;
+        dragBottomRight.y = m_bounds.y + m_bounds.height - MIN_SHAPE_SIZE;
+        break;
+    default:
+        break;
+    }
+    m_dragBounds = rectangle(dragTopLeft, dragBottomRight - dragTopLeft);
 	return true;
 }
 
@@ -114,51 +159,84 @@ void ShapeEditFrame::Hide()
 void ShapeEditFrame::ApplyDragChanges(int x, int y)
 {
 	rectangle br = GetBounds();
-	const int dx = x - m_lastX;
-	const int dy = y - m_lastY;
+	const float dx = float(x - m_lastX);
+    const float dy = float(y - m_lastY);
 	m_lastX = x;
 	m_lastY = y;
+    vec2 topLeft = br.origin();
+    vec2 bottomRight = topLeft + br.size();
 	switch (m_currentZone) {
-	case Inside:
-		br.x += dx;
-		br.y += dy;
+    case Inside:
+        topLeft = m_dragBounds.clampToBounds(br.origin() + vec2(dx, dy));
+        bottomRight = topLeft + br.size();
 		break;
-	case LeftEdge:
-		br.x += dx;
-		br.width -= dx;
+    case LeftEdge:
+        topLeft.x = m_dragBounds.clampXToBounds(topLeft.x + dx);
 		break;
 	case RightEdge:
-		br.width += dx;
+        bottomRight.x = m_dragBounds.clampXToBounds(bottomRight.x + dx);
 		break;
-	case TopEdge:
-		br.y += dy;
-		br.height -= dy;
+    case TopEdge:
+        topLeft.y = m_dragBounds.clampYToBounds(topLeft.y + dy);
 		break;
-	case BottomEdge:
-		br.height += dy;
+    case BottomEdge:
+        bottomRight.y = m_dragBounds.clampYToBounds(bottomRight.y + dy);
 		break;
-	case LeftTopCorner:
-		br.x += dx;
-		br.width -= dx;
-		br.y += dy;
-		br.height -= dy;
+    case LeftTopCorner:
+        topLeft.x = m_dragBounds.clampXToBounds(br.left() + dx);
+        topLeft.y = m_dragBounds.clampYToBounds(br.top() + dy);
 		break;
-	case RightBottomCorner:
-		br.width += dx;
-		br.height += dy;
+    case RightBottomCorner:
+        bottomRight.x = m_dragBounds.clampXToBounds(br.right() + dx);
+        bottomRight.y = m_dragBounds.clampYToBounds(br.bottom() + dy);
 		break;
-	case LeftBottomCorner:
-		br.x += dx;
-		br.width -= dx;
-		br.height += dy;
+    case LeftBottomCorner:
+        topLeft.x = m_dragBounds.clampXToBounds(br.left() + dx);
+        bottomRight.y = m_dragBounds.clampYToBounds(br.bottom() + dy);
 		break;
-	case RightTopCorner:
-		br.width += dx;
-		br.y += dy;
-		br.height -= dy;
+    case RightTopCorner:
+        bottomRight.x = m_dragBounds.clampXToBounds(br.right() + dx);
+        topLeft.y = m_dragBounds.clampYToBounds(br.top() + dy);
 		break;
 	}
-	SetBounds(br);
+#if 0
+    case LeftEdge:
+        br.x += dx;
+        br.width -= dx;
+        break;
+    case RightEdge:
+        br.width += dx;
+        break;
+    case TopEdge:
+        br.y += dy;
+        br.height -= dy;
+        break;
+    case BottomEdge:
+        br.height += dy;
+        break;
+    case LeftTopCorner:
+        br.x += dx;
+        br.width -= dx;
+        br.y += dy;
+        br.height -= dy;
+        break;
+    case RightBottomCorner:
+        br.width += dx;
+        br.height += dy;
+        break;
+    case LeftBottomCorner:
+        br.x += dx;
+        br.width -= dx;
+        br.height += dy;
+        break;
+    case RightTopCorner:
+        br.width += dx;
+        br.y += dy;
+        br.height -= dy;
+        break;
+}
+#endif
+    SetBounds(rectangle(topLeft, bottomRight - topLeft));
 }
 
 void ShapeEditFrame::UpdateCurrentZone(int x, int y)

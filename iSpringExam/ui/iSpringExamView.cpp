@@ -11,6 +11,7 @@
 #include "../shapes/rectanglenode.h"
 #include "../shapes/ellipsenode.h"
 #include "BackBuffer.h"
+#include "../render/GdiplusRenderer.h"
 
 CISpringExamView::CISpringExamView() = default;
 
@@ -105,14 +106,14 @@ void CISpringExamView::OnFinalMessage(HWND /*hWnd*/)
 
 LRESULT CISpringExamView::OnPaint(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
 {
-	Gdiplus::Pen pen(Gdiplus::Color(0xFF, 0, 0), 2.f);
-	Gdiplus::SolidBrush brush(Gdiplus::Color(0xFF, 0xFF, 0));
-	std::unique_ptr<Gdiplus::Graphics> backGraphics{ m_backBuffer->StartRender() };
-	backGraphics->SetSmoothingMode(Gdiplus::SmoothingModeHighQuality);
-	AbstractNode::RenderContext context(pen, brush, *backGraphics);
-	m_scene->render(context);
+    std::unique_ptr<Gdiplus::Graphics> backGraphics{ m_backBuffer->StartRender() };
+    backGraphics->SetSmoothingMode(Gdiplus::SmoothingModeHighQuality);
+    GdiplusRenderer renderer(*backGraphics);
+    renderer.SetPen(VGPen(vec3(1, 0, 0), 2.f));
+    renderer.SetBrush(VGBrush(vec3(1, 1, 0)));
+    m_scene->render(renderer);
 	if (m_scene->pickedNode())
-		m_editFrame.Render(*backGraphics);
+		m_editFrame.Render(renderer);
 	backGraphics.reset();
 
 	CPaintDC dc(m_hWnd);
@@ -126,9 +127,10 @@ LRESULT CISpringExamView::OnPaint(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lPa
 LRESULT CISpringExamView::OnResize(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM lParam, BOOL& /*bHandled*/)
 {
 	const int width = LOWORD(lParam);
-    const int height = HIWORD(lParam);
+	const int height = HIWORD(lParam);
 	m_scene->setMinimalSize(width, height);
 	m_backBuffer->SetSize(Gdiplus::Size(width, height));
+    m_editFrame.SetSceneBounds(rectangle(0, 0, float(width), float(height)));
 	return 0;
 }
 

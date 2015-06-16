@@ -28,12 +28,9 @@ json11::Json EllipseNode::toJson() const
     return json11::Json(ret);
 }
 
-void EllipseNode::render(RenderContext &context) const
+void EllipseNode::render(IVGRenderer &renderer) const
 {
-    const rectangle &br = boundingRect();
-    Gdiplus::RectF rect{br.x, br.y, br.width, br.height};
-    context.graphics.FillEllipse(&context.brush, rect);
-    context.graphics.DrawEllipse(&context.pen, rect);
+    renderer.DrawEllipse(boundingRect());
 }
 
 bool EllipseNode::fromJson(const json11::Json &json)

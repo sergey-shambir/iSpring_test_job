@@ -28,7 +28,7 @@ public:
     bool addFromJson(const json11::Json &json, std::string &incorrectJson);
 	bool addFromJsonFile(const std::string &path, std::string &errorReason);
 	bool saveToJsonFile(const std::string &path, std::string &errorReason) const;
-    void render(AbstractNode::RenderContext &context);
+    void render(IVGRenderer &renderer);
     void clearScene();
     void setUpdateCallback(const UpdateCallback &callback);
     bool pickNode(int x, int y);

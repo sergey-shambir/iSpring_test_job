@@ -112,6 +112,8 @@
     </Midl>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="render\AbstractVGRenderer.cpp" />
+    <ClCompile Include="render\GdiplusRenderer.cpp" />
     <ClCompile Include="ui\BackBuffer.cpp" />
     <ClCompile Include="ui\AboutDlg.cpp" />
     <ClCompile Include="main.cpp" />
@@ -132,6 +134,9 @@
     <ClCompile Include="ui\CustomDialogs.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="render\AbstractVGRenderer.h" />
+    <ClInclude Include="render\GdiplusRenderer.h" />
+    <ClInclude Include="render\IVGRenderer.h" />
     <ClInclude Include="ui\BackBuffer.h" />
     <ClInclude Include="ui\AboutDlg.h" />
     <ClInclude Include="ui\ShapeEditFrame.h" />

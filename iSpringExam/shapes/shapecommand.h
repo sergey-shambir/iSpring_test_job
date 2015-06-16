@@ -31,7 +31,7 @@ public:
     static const int DEFAULT_SIZE;
 
     InsertShapeCommand();
-    InsertShapeCommand(const std::string &type);
+    explicit InsertShapeCommand(const std::string &type);
     std::string type() const;
     void setType(const std::string &type);
     bool redo(IShapeSceneControl &scene);
@@ -46,7 +46,7 @@ class SetShapeBoundsCommand : public AbstractShapeCommand
 {
 public:
     SetShapeBoundsCommand();
-    SetShapeBoundsCommand(const rectangle &newBounds);
+    explicit SetShapeBoundsCommand(const rectangle &newBounds);
     rectangle newBounds() const;
     void setNewBounds(const rectangle &newBounds);
     bool redo(IShapeSceneControl &scene);

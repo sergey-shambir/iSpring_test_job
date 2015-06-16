@@ -56,9 +56,29 @@ public:
         return vec2<treal>(width, height);
     }
 
+    inline treal left() const
+    {
+        return x;
+    }
+
+    inline treal right() const
+    {
+        return x + width;
+    }
+
+    inline treal top() const
+    {
+        return y;
+    }
+
+    inline treal bottom() const
+    {
+        return y + height;
+    }
+
     inline bool hits(treal px, treal py) const
     {
-        return (px >= x) && (py >= y) && (px <= x + width) && (py <= y + height);
+        return (px >= x) && (py >= y) && (px <= right()) && (py <= bottom());
     }
 
     inline bool hits(const vec2<treal> &p) const
@@ -68,12 +88,42 @@ public:
 
     inline bool hitsBound(treal px, treal py) const
     {
-        return (x == px) || (y == py) || (x + width == px) || (y + height == py);
+        return (x == px) || (y == py) || (right() == px) || (bottom() == py);
     }
 
     inline bool hitsBound(const vec2<treal> &p) const
     {
         return hitsBound(p.x, p.y);
+    }
+
+    inline treal clampXToBounds(treal value) const
+    {
+        if (value < left())
+            value = left();
+        else if (value > right())
+            value = right();
+        return value;
+    }
+
+    inline treal clampYToBounds(treal value) const
+    {
+        if (value < top())
+            value = top();
+        else if (value > bottom())
+            value = bottom();
+        return value;
+    }
+
+    inline vec2<treal> clampToBounds(const vec2<treal> &p) const
+    {
+        return vec2<treal>(clampXToBounds(p.x), clampYToBounds(p.y));
+    }
+
+    rectangle<treal> intersected(const rectangle<treal> &other) const
+    {
+        vec2<treal> topLeft{ maxValue<treal>(x, other.x), maxValue<treal>(y, other.y) };
+        vec2<treal> bottomRight{ minValue<treal>(right(), other.right()), minValue<treal>(bottom(), other.bottom()) };
+        return rectangle<treal>(topLeft, bottomRight - topLeft);
     }
 
     inline treal diagonalLength() const

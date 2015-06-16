@@ -21,11 +21,9 @@ json11::Json RectangleNode::toJson() const
     return json11::Json(ret);
 }
 
-void RectangleNode::render(RenderContext &context) const
+void RectangleNode::render(IVGRenderer &renderer) const
 {
-    const rectangle &br = boundingRect();
-    context.graphics.FillRectangle(&context.brush, br.x, br.y, br.width, br.height);
-    context.graphics.DrawRectangle(&context.pen, br.x, br.y, br.width, br.height);
+    renderer.DrawRectangle(boundingRect());
 }
 
 bool RectangleNode::fromJson(const json11::Json &json)

@@ -2,6 +2,19 @@
 #include <cmath>
 
 namespace base {
+
+template <class treal>
+treal minValue(treal left, treal right)
+{
+    return left < right ? left : right;
+}
+
+template <class treal>
+treal maxValue(treal left, treal right)
+{
+    return left > right ? left : right;
+}
+
 template <class treal>
 class vec2
 {

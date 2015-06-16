@@ -34,15 +34,15 @@ json11::Json TriangleNode::toJson() const
     return json11::Json(ret);
 }
 
-void TriangleNode::render(RenderContext &context) const
+void TriangleNode::render(IVGRenderer &renderer) const
 {
     const rectangle &br = boundingRect();
-	Gdiplus::PointF points[3];
-	points[0] = Gdiplus::PointF(br.x, br.y + br.height);
-	points[1] = Gdiplus::PointF(br.x + 0.5f * br.width, br.y);
-	points[2] = Gdiplus::PointF(br.x + br.width, br.y + br.height);
-    context.graphics.FillPolygon(&context.brush, points, 3);
-    context.graphics.DrawPolygon(&context.pen, points, 3);
+    std::vector<vec2> points = {
+        vec2(br.x, br.y + br.height),
+        vec2(br.x + 0.5f * br.width, br.y),
+        vec2(br.x + br.width, br.y + br.height)
+    };
+    renderer.DrawPolygon(points);
 }
 
 bool TriangleNode::fromJson(const json11::Json &json)

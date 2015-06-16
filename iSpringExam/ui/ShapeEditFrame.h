@@ -3,6 +3,8 @@
 #include "../math/rectangle.h"
 #include <map>
 
+class AbstractVGRenderer;
+
 class ShapeEditFrame
 {
 public:
@@ -22,12 +24,14 @@ public:
 	ShapeEditFrame();
 	~ShapeEditFrame();
 
-	const rectangle &GetBounds() const;
+    const rectangle &GetBounds() const;
+    const rectangle &GetSceneBounds() const;
 	bool IsVisible() const;
 	bool IsInDragState() const;
-	void SetBounds(const rectangle &bounds);
+    void SetBounds(const rectangle &bounds);
+    void SetSceneBounds(const rectangle &bounds);
 	void SetVisible(bool isVisible);
-	void Render(Gdiplus::Graphics &graphics);
+    void Render(AbstractVGRenderer &renderer);
 	//! Starts dragging if (x,y) is not outside frame
 	bool StartDrag(int x, int y);
 	void FinishDrag();
@@ -43,7 +47,9 @@ private:
 	LPCTSTR GetCursorNameForZone(Zone zone) const;
 	HCURSOR LoadCursorForZone(Zone zone);
 
-	rectangle m_bounds;
+    rectangle m_bounds;
+    rectangle m_sceneBounds;
+    rectangle m_dragBounds;
 	std::map<LPCTSTR, HCURSOR> m_cursors;
 	bool m_isVisible = true;
 	bool m_isInDragState = false;

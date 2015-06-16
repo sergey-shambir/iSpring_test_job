@@ -191,11 +191,10 @@ bool ShapesScene::saveToJsonFile(const std::string &path, std::string &errorReas
 	return true;
 }
 
-void ShapesScene::render(AbstractNode::RenderContext &context)
+void ShapesScene::render(IVGRenderer &renderer)
 {
-    for (const auto &node : d->m_nodes) {
-        node->render(context);
-    }
+    for (const auto &node : d->m_nodes)
+        node->render(renderer);
 }
 
 void ShapesScene::clearScene()
