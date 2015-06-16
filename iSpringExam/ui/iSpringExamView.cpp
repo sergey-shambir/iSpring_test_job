@@ -11,6 +11,7 @@
 #include "../shapes/rectanglenode.h"
 #include "../shapes/ellipsenode.h"
 #include "../render/GdiplusRenderer.h"
+#include "../render/Direct2DRenderer.h"
 
 CISpringExamView::CISpringExamView()
 {
@@ -115,6 +116,7 @@ void CISpringExamView::OnFinalMessage(HWND /*hWnd*/)
 
 LRESULT CISpringExamView::OnPaint(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
 {
+#if 0
     CPaintDC dc(*this);
     m_gdiplusRenderer->StartFrameRender();
     m_gdiplusRenderer->SetPen(VGPen(vec3(1, 0, 0), 2.f));
@@ -123,6 +125,15 @@ LRESULT CISpringExamView::OnPaint(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lPa
     if (m_scene->pickedNode())
         m_editFrame.Render(*m_gdiplusRenderer);
     m_gdiplusRenderer->EndFrameRender(dc.m_hDC);
+#else
+    m_direct2DRenderer->StartFrameRender();
+    m_direct2DRenderer->SetPen(VGPen(vec3(1, 0, 0), 2.f));
+    m_direct2DRenderer->SetBrush(VGBrush(vec3(1, 1, 0)));
+    m_scene->render(*m_direct2DRenderer);
+    if (m_scene->pickedNode())
+        m_editFrame.Render(*m_direct2DRenderer);
+    m_direct2DRenderer->EndFrameRender();
+#endif
 
 	return 0;
 }
@@ -133,6 +144,7 @@ LRESULT CISpringExamView::OnResize(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM lPar
 	const int height = HIWORD(lParam);
 	m_scene->setMinimalSize(width, height);
     m_gdiplusRenderer->OnWindowResize(width, height);
+    m_direct2DRenderer->OnWindowResize(width, height);
     m_editFrame.SetSceneBounds(rectangle(0, 0, float(width), float(height)));
 	return 0;
 }
@@ -140,6 +152,7 @@ LRESULT CISpringExamView::OnResize(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM lPar
 LRESULT CISpringExamView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
 {
     m_gdiplusRenderer.reset(new CGdiplusRenderer());
+    m_direct2DRenderer.reset(new Direct2DRenderer(*this));
 	m_scene.reset(new ShapesScene);
 	InitSceneUpdates();
 

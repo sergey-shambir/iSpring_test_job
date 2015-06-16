@@ -7,6 +7,7 @@
 #include "ShapeEditFrame.h"
 
 class CGdiplusRenderer;
+class Direct2DRenderer;
 
 class CISpringExamView : public CWindowImpl<CISpringExamView>
 {
@@ -64,6 +65,7 @@ private:
 
 	std::unique_ptr<ShapesScene> m_scene;
 	std::unique_ptr<CGdiplusRenderer> m_gdiplusRenderer;
+    std::unique_ptr<Direct2DRenderer> m_direct2DRenderer;
 	std::string m_sceneSavePath;
 	ShapeEditFrame m_editFrame;
 	rectangle m_pickedBoundsBeforeDrag;
